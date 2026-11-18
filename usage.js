@@ -285,6 +285,10 @@ async function sync() {
       const focused = document.activeElement?.dataset.day;
       sources();
       render();
+      if(location.hash==="#card" && activeRows.length && !cardDialog.open){
+        history.replaceState(null,"",location.pathname);
+        $("share-usage-card").click();
+      }
       if (focused)
         document
           .querySelector(
@@ -307,33 +311,66 @@ async function sync() {
 }
 window.addEventListener("themechange", paint);
 window.addEventListener("billrateschange", render);
+const sample = importedDashboard && location.hash === "#sample";
 if (importedDashboard) {
   rows = UsageImport.load().filter(row => row.date <= today && amount(row) > 0);
+  if(sample){
+    $("use").hidden = true;
+    rows=[];
+    for(let i=0;i<182;i++){
+      if(i>14 && i%9===4) continue;
+      const day=new Date(now.getFullYear(),now.getMonth(),now.getDate()-i).toLocaleDateString("sv-SE");
+      for(const [tool,model,base] of [["codex","gpt-6.2-sol",920000],["claude-code","claude-opus-5-5",520000],["kimi","kimi-k3",180000]]){
+        const input=Math.round(base*(1+Math.sin((i+1)*1.7)*.8+(i%7)/7));
+        rows.push({date:day,tool,model,input,output:Math.round(input/12),cached:Math.floor(input*.82),written:0});
+      }
+    }
+  }
   const latest = rows.reduce((last,row) => row.date > last ? row.date : last, "");
   if (latest) {
     month = latest.slice(0, 7);
     selected = latest;
   }
   lastUpdate = new Date().toISOString();
-  $("sync").textContent = latest ? "本标签页已导入用量" : "请返回主页导入用量";
+  $("sync").textContent = sample ? "示例名片 · 演示数据" : latest ? "个人用量报告" : "请返回主页导入用量";
   sources();
-  const dialog = $("usage-card-preview");
-  $("close-usage-card").onclick = () => dialog.close();
-  $("share-usage-card").onclick = () => {
-    if (!activeRows.some(row => amount(row) > 0)) return;
-    const tool = $("tool").value;
-    const period = selected || month;
-    const through = selected || (month === today.slice(0,7) ? today :
-      dateKey(new Date(Number(month.slice(0,4)),Number(month.slice(5)),0).getDate()));
-    const history = rows.filter(row => !tool || row.tool === tool);
-    const bill = Pricing.bill(activeRows, Billing.lookup);
-    const url = UsageCard.makeCard({period, through, active:activeRows, history, bill, toolName});
-    $("usage-card-image").src = url;
-    $("save-usage-card").href = url;
-    dialog.showModal();
-  };
   render();
 } else {
   render();
   sync();
+}
+
+
+function personalCard() {
+  if (!activeRows.some(row => amount(row)>0)) return;
+  const tool=$("tool").value;
+  const through=selected || (month===today.slice(0,7)?today:dateKey(new Date(Number(month.slice(0,4)),Number(month.slice(5)),0).getDate()));
+  const history=rows.filter(row=>!tool || row.tool===tool);
+  const url=UsageCard.makeCard({period:selected||month,through,active:activeRows,history,
+    bill:Pricing.bill(activeRows,Billing.lookup),toolName,nickname:$("card-nickname").value.trim()||"深夜开发者",avatar:cardAvatar,sample});
+  $("usage-card-image").src=url;
+  $("save-usage-card").href=url;
+}
+let cardAvatar=null;
+const cardDialog=$("usage-card-preview");
+if(cardDialog) {
+  $("close-usage-card").onclick=()=>cardDialog.close();
+  $("card-nickname").oninput=personalCard;
+  $("card-avatar").onchange=async e=>{
+    const file=e.target.files[0];
+    if(!file){cardAvatar=null;personalCard();return;}
+    if(file.size>8*1024*1024){$("avatar-status").textContent="请选择小于 8 MB 的头像。";return;}
+    const uri=URL.createObjectURL(file);
+    try{
+      const img=new Image();img.src=uri;await img.decode();cardAvatar=img;
+      $("avatar-status").textContent="";personalCard();
+    }catch{$("avatar-status").textContent="头像无法读取，请选择图片。";}
+    finally{URL.revokeObjectURL(uri);}
+  };
+  $("share-usage-card").onclick=async()=>{
+    await UsageCard.ready();
+    personalCard();
+    cardDialog.showModal();
+  };
+  if(sample || location.hash==="#card" && activeRows.length) $("share-usage-card").click();
 }

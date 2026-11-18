@@ -26,12 +26,10 @@
         ><a
           class="actual-link"
           href="#guide"
-          title="查看用量导入说明"
+          title="自动生成个人报告"
           >使用说明</a
         ><button type="button" id="theme-toggle" aria-label="切换到浅色主题"><span class="mode-icon" aria-hidden="true">☀</span><span class="mode-label">浅色</span></button>
-        <button id="share" class="primary">
-          <span aria-hidden="true">↑</span> 生成分享图
-        </button>
+        <a class="primary" id="personal-card-link" href="usage.html#sample">个人分享卡</a>
       </div>
     </header>
     <main>
@@ -40,30 +38,17 @@
         <span class="date">价格快照　2026.11.18</span>
       </div>
       <section class="card guide-panel" id="guide" aria-labelledby="guide-title">
-  <div class="guide-head">
-    <div>
-      <h2 id="guide-title">使用说明</h2>
-      <p>用已有的本地 AI 助手读取用量，直接在网页看账单和生成分享卡。</p>
-    </div>
-    <a class="guide-link" id="last-import" href="usage.html" hidden>查看本次导入 ↗</a>
-  </div>
-  <div class="guide-flow">
-    <div class="guide-step">
-      <h3>复制给 AI</h3>
-      <p>把指令发给有本机文件读取能力的 Codex 或 Claude Code，汇总最近 30 天的用量。</p>
-      <button type="button" class="primary" id="copy-guide" disabled>复制给 AI</button>
-      <details id="prompt-details">
-        <summary>查看完整指令</summary>
-        <textarea id="guide-prompt" readonly rows="6" aria-label="完整 AI 指令"></textarea>
-      </details>
-    </div>
-    <form class="guide-step" id="usage-import-form">
-      <h3><label for="usage-json">粘贴用量结果</label></h3>
-      <p>把 AI 返回的 JSON（结构化数据）贴在这里。数据留在当前浏览器标签页。</p>
-      <textarea id="usage-json" rows="4" required maxlength="1500000" placeholder='{"version":1,"rows":[…]}'></textarea>
-      <button type="submit" class="primary">导入并查看用量</button>
-    </form>
-  </div>
+  <div class="guide-head"><div><h2 id="guide-title">生成我的用量名片</h2>
+  <p>复制指令给能使用本机终端的 AI，运行后自动打开你的个人报告。无需安装，也无需粘贴用量数据。</p></div>
+  <a class="guide-link" id="last-import" href="usage.html" hidden>查看已有用量 ↗</a></div>
+  <div class="guide-flow"><div class="guide-step">
+  <h3>让 AI 在本机统计</h3><p>内置读取 Codex、Claude Code、Kimi Code、OpenClaw、Hermes，以及兼容的 Cursor 缓存与 OpenCode 消息记录。已有 OpenToken 的 Mac 还能读取其识别的其他工具。</p>
+  <button type="button" class="primary" id="copy-guide" disabled>复制给 AI · 自动打开用量页</button>
+  <details id="prompt-details"><summary>查看指令与运行条件</summary><p>需要已有的 Python 3.9+ 和本机日志读取权限。报告按当前电脑最近 26 周的可用记录生成。</p><textarea id="guide-prompt" readonly rows="5" aria-label="完整 AI 指令"></textarea></details>
+  </div><div class="guide-step"><h3>分享个人名片</h3><p>在个人报告里选一天或整月，点击「生成个人分享卡」，设置昵称和头像，即可保存带费用、活跃轨迹和工具占比的图片。</p>
+  <a href="usage.html#sample" class="guide-link">预览示例名片 ↗</a></div></div>
+  <details><summary>已有用量数据？手动导入</summary><form id="usage-import-form" class="guide-step"><label for="usage-json">用量 JSON</label>
+  <textarea id="usage-json" rows="3" required maxlength="1500000"></textarea><button type="submit" class="primary">导入并查看用量</button></form></details>
   <p id="guide-status" role="status"></p>
 </section>
 
@@ -157,7 +142,7 @@
               <span class="section-icon" aria-hidden="true">▥</span>
               模型费用对比
             </h2>
-            <span class="currency">美元 USD</span>
+            <button id="share" class="currency">导出费用图</button>
           </div>
           <div class="tabs bill-switch" aria-label="费用模式">
             <button id="billMode" hidden>我的真实账单</button><button id="compareMode">假设全切对比</button>

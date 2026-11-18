@@ -41,6 +41,7 @@ const UsageImport = (() => {
     sessionStorage.setItem(key, JSON.stringify(rows));
   }
   function load() {
+    if(Array.isArray(globalThis.ledgerSnapshot)) return globalThis.ledgerSnapshot;
     try { return JSON.parse(sessionStorage.getItem(key)) || []; }
     catch { return []; }
   }

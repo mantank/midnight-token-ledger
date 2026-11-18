@@ -7,6 +7,7 @@
   const preview = document.getElementById("prompt-details");
   document.getElementById("last-import").hidden = !UsageImport.load().length;
 
+  document.getElementById("personal-card-link").href = UsageImport.load().length ? "usage.html#card" : "usage.html#sample";
   fetch("ai-usage-prompt.txt").then(response => {
     if (!response.ok) throw Error();
     return response.text();
@@ -19,7 +20,7 @@
     if (navigator.clipboard?.writeText) {
       try {
         await navigator.clipboard.writeText(source.value);
-        status.textContent = "已复制。粘贴给 Codex、Claude Code 等本地 AI 助手。";
+        status.textContent = "已复制。发给有本机终端权限的 AI 执行，它会自动打开个人报告。";
         return;
       } catch { /* Use manual selection when clipboard access is unavailable. */ }
     }
