@@ -28,3 +28,16 @@ const models = [
   defaults: { input, cached, output },
   editable: family === "Claude" || family === "DeepSeek",
 }));
+
+// Additional public API reference prices for recorded local usage.
+const billingModels = [
+  ["GPT-5.3 Codex", "1.75", "0.175", "14"],
+  ["GPT-5.4", "2.50", "0.25", "15"],
+  ["Claude Fable 5.1", "10", "0.25", "50"],
+  ["Claude Fable 5", "10", "1", "50"],
+  ["Claude Opus 5", "5", "0.50", "25"],
+  ["Claude Opus 4.8", "5", "0.50", "25"],
+  ["Claude Sonnet 5.5", "2", "0.10", "10"],
+  ["Claude Sonnet 4.6", "3", "0.30", "15"],
+  ["Claude Sonnet 4.5", "3", "0.30", "15"],
+].map(([name,input,cached,output]) => ({name,defaults:{input,cached,output},editable:true}));

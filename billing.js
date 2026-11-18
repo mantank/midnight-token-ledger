@@ -5,7 +5,7 @@ const Billing = (() => {
   const id = (name) => name.trim().toLowerCase().replace(/[ .]+/g, "-");
   const aliases = new Map([["deepseek-flash", "deepseek-v4-1-flash"]]);
   const canonical = (name) => aliases.get(id(name)) || id(name);
-  const builtins = new Map(models.map((m) => [canonical(m.name), m]));
+  const builtins = new Map([...models, ...billingModels].map((m) => [canonical(m.name), m]));
   const overrides = new Map();
   function valid(rates) {
     try {
