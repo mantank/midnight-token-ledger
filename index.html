@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="zh-CN" data-public="true">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0B0F17" />
+    <title>多模型 API 用量与花费对比台</title>
+    <script src="theme.js"></script>
+    <link rel="stylesheet" href="styles.css" />
+    <script defer src="models.js"></script>
+    <script defer src="pricing.js"></script>
+    <script defer src="billing.js"></script>
+    <script defer src="share.js"></script>
+    <script defer src="app.js"></script>
+  </head>
+  <body>
+    <header>
+      <div class="nav">
+        <div class="brand">
+          <span class="mark" aria-hidden="true"><i></i><i></i><i></i></span
+          >深夜开发者
+        </div>
+        <span class="nav-sub">模型成本工作台</span
+        ><a
+          class="actual-link"
+          href="#install"
+          title="下载安装本机用量看板"
+          >下载安装</a
+        ><button type="button" id="theme-toggle" aria-label="切换到浅色主题"><span class="mode-icon" aria-hidden="true">☀</span><span class="mode-label">浅色</span></button>
+        <button id="share" class="primary">
+          <span aria-hidden="true">↑</span> 生成分享图
+        </button>
+      </div>
+    </header>
+    <main>
+      <div class="heading">
+        <div><h1>多模型 API 用量与花费对比台</h1></div>
+        <span class="date">价格快照　2026.11.18</span>
+      </div>
+      <section class="card install-panel" id="install" aria-labelledby="install-title">
+          <div>
+            <h2 id="install-title">统计自己的模型用量</h2>
+            <p>下载并解压安装包。在 macOS 或 Windows 双击对应的启动文件，Linux 在解压目录运行 <code>sh start-ledger.sh</code>。需要 Python 3.9 或更新版本。</p>
+            <p>内置支持 Codex 和 Claude Code。用量与账单留在自己的电脑，费用按模型单价估算。</p>
+          </div>
+          <div class="install-actions">
+            <a class="primary" href="token-ledger.zip" download>下载安装包</a>
+            <a href="http://127.0.0.1:48731/usage.html">已安装 · 打开本机看板 ↗</a>
+          </div>
+        </section>
+      <div class="scene-switch">
+        <span class="scenario-title">场景预设</span>
+        <div id="presets"></div>
+        <p class="custom" id="custom" hidden>当前为自定义场景</p>
+      </div>
+      <section class="hero" aria-label="费用概览">
+        <canvas id="terrain" aria-hidden="true"></canvas>
+        <div class="hero-content" id="billHero" hidden><div class="hero-label" id="heroBillLabel">当前实际总花费</div><strong id="heroBillAmount">—</strong><span id="heroBillScope"></span></div>
+        <div class="hero-content" id="compareHero" aria-live="polite" aria-atomic="true">
+          <div class="hero-label"><i></i> 最低预估费用</div>
+          <strong id="best">—</strong><span id="winner"></span>
+        </div>
+        <div class="hero-stats" id="compareStats">
+          <div><small>总用量 · Token</small><b id="tokens">—</b></div>
+          <div><small>最高与最低价差</small><b id="spread">—</b></div>
+        </div>
+      </section>
+      <div class="workbench">
+        <section class="card setup">
+          <h2>
+            <span class="section-icon" aria-hidden="true">≡</span> 用量设置
+          </h2>
+          <div class="field">
+            <label for="input">输入 Token</label>
+            <div>
+              <input
+                id="input"
+                inputmode="numeric"
+                value="20000"
+                maxlength="32"
+                aria-describedby="input-error"
+              /><span>tokens</span>
+            </div>
+            <small id="input-error"></small>
+          </div>
+          <div class="field">
+            <label for="output">输出 Token</label>
+            <div>
+              <input
+                id="output"
+                inputmode="numeric"
+                value="4000"
+                maxlength="32"
+                aria-describedby="output-error"
+              /><span>tokens</span>
+            </div>
+            <small id="output-error"></small>
+          </div>
+          <div class="field">
+            <label for="hit">输入缓存命中率</label>
+            <div>
+              <input
+                id="hit"
+                inputmode="decimal"
+                value="40"
+                maxlength="16"
+                aria-describedby="hit-error"
+              /><span>%</span>
+            </div>
+            <small id="hit-error"></small>
+          </div>
+          <input
+            aria-label="调整缓存命中率"
+            id="slider"
+            type="range"
+            min="0"
+            max="100"
+            step="0.01"
+            value="40"
+          />
+          <div class="limits"><span>0%</span><span>100%</span></div>
+          <details class="note">
+            <summary>估算口径与价格来源</summary>
+            <p>
+              按价格快照折算文本输入、缓存读取及输出。缓存写入、存储、工具调用与税费另计。月度按
+              30 天估算。
+            </p>
+            <p>
+              DeepSeek 默认低峰价，高峰三项均为两倍。Gemini 4 Carbon
+              当前价格有效至 2026-11-30。
+            </p>
+            <div id="sources"></div>
+          </details>
+        </section>
+        <section class="card results">
+          <div class="results-title">
+            <h2>
+              <span class="section-icon" aria-hidden="true">▥</span>
+              模型费用对比
+            </h2>
+            <span class="currency">美元 USD</span>
+          </div>
+          <div class="tabs bill-switch" aria-label="费用模式">
+            <button id="billMode" hidden>我的真实账单</button><button id="compareMode">假设全切对比</button>
+          </div>
+          <div id="billPanel" hidden>
+            <p class="unit" id="billPeriod"></p><div class="bill-summary" id="calcBill"></div>
+            <div id="billRows"></div><p class="foot">按实际用量与模型单价折算，按花费降序排列。缓存写入按普通输入计，未含写入附加费、工具费及税费。</p>
+          </div>
+          <div id="comparePanel">
+          <div class="results-tools">
+            <div class="tabs">
+              <button id="costTab" aria-pressed="true">费用明细</button
+              ><button id="rateTab" aria-pressed="false">模型单价</button>
+            </div>
+            <div class="legend">
+              <span>普通输入</span><span>缓存读取</span><span>输出</span>
+            </div>
+          </div>
+          <div id="costPanel">
+            <table>
+              <thead>
+                <tr>
+                  <th>模型 / 提供商</th>
+                  <th class="mix">费用构成</th>
+                  <th class="money">预估费用</th>
+                </tr>
+              </thead>
+              <tbody id="rows"></tbody>
+            </table>
+            <p class="foot">按预估费用升序排列 · 点击模型查看明细</p>
+          </div>
+          <div id="ratePanel" hidden>
+            <p class="unit">每百万 Token 单价（美元）</p>
+            <div id="rateRows"></div>
+          </div>
+          </div>
+        </section>
+      </div>
+    </main>
+    <dialog id="preview" aria-labelledby="shareTitle">
+      <div class="dialoghead">
+        <h2 id="shareTitle">对比分享图</h2>
+        <button id="close" aria-label="关闭预览">×</button>
+      </div>
+      <img id="poster" alt="包含当前场景、用量和七个模型费用的分享图" /><a
+        class="primary"
+        id="download"
+        download="模型费用对比.png"
+        >保存 PNG 图片</a
+      >
+    </dialog>
+  </body>
+</html>
