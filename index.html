@@ -11,6 +11,8 @@
     <script defer src="pricing.js"></script>
     <script defer src="billing.js"></script>
     <script defer src="share.js"></script>
+    <script defer src="usage-import.js"></script>
+    <script defer src="guide.js"></script>
     <script defer src="app.js"></script>
   </head>
   <body>
@@ -23,9 +25,9 @@
         <span class="nav-sub">模型成本工作台</span
         ><a
           class="actual-link"
-          href="#install"
-          title="下载安装本机用量看板"
-          >下载安装</a
+          href="#guide"
+          title="查看用量导入说明"
+          >使用说明</a
         ><button type="button" id="theme-toggle" aria-label="切换到浅色主题"><span class="mode-icon" aria-hidden="true">☀</span><span class="mode-label">浅色</span></button>
         <button id="share" class="primary">
           <span aria-hidden="true">↑</span> 生成分享图
@@ -37,17 +39,34 @@
         <div><h1>多模型 API 用量与花费对比台</h1></div>
         <span class="date">价格快照　2026.11.18</span>
       </div>
-      <section class="card install-panel" id="install" aria-labelledby="install-title">
-          <div>
-            <h2 id="install-title">统计自己的模型用量</h2>
-            <p>下载并解压安装包。在 macOS 或 Windows 双击对应的启动文件，Linux 在解压目录运行 <code>sh start-ledger.sh</code>。需要 Python 3.9 或更新版本。</p>
-            <p>内置支持 Codex 和 Claude Code。用量与账单留在自己的电脑，费用按模型单价估算。 <a href="https://www.python.org/downloads/">下载 Python</a></p>
-          </div>
-          <div class="install-actions">
-            <a class="primary" href="token-ledger.zip" download>下载安装包</a>
-            <a href="http://127.0.0.1:48731/usage.html">已安装 · 打开本机看板 ↗</a>
-          </div>
-        </section>
+      <section class="card guide-panel" id="guide" aria-labelledby="guide-title">
+  <div class="guide-head">
+    <div>
+      <h2 id="guide-title">使用说明</h2>
+      <p>用已有的本地 AI 助手读取用量，直接在网页看账单和生成分享卡。</p>
+    </div>
+    <a class="guide-link" id="last-import" href="usage.html" hidden>查看本次导入 ↗</a>
+  </div>
+  <div class="guide-flow">
+    <div class="guide-step">
+      <h3>复制给 AI</h3>
+      <p>把指令发给有本机文件读取能力的 Codex 或 Claude Code，汇总最近 30 天的用量。</p>
+      <button type="button" class="primary" id="copy-guide" disabled>复制给 AI</button>
+      <details id="prompt-details">
+        <summary>查看完整指令</summary>
+        <textarea id="guide-prompt" readonly rows="6" aria-label="完整 AI 指令"></textarea>
+      </details>
+    </div>
+    <form class="guide-step" id="usage-import-form">
+      <h3><label for="usage-json">粘贴用量结果</label></h3>
+      <p>把 AI 返回的 JSON（结构化数据）贴在这里。数据留在当前浏览器标签页。</p>
+      <textarea id="usage-json" rows="4" required maxlength="1500000" placeholder='{"version":1,"rows":[…]}'></textarea>
+      <button type="submit" class="primary">导入并查看用量</button>
+    </form>
+  </div>
+  <p id="guide-status" role="status"></p>
+</section>
+
       <div class="scene-switch">
         <span class="scenario-title">场景预设</span>
         <div id="presets"></div>

@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="zh-CN" data-public="true">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#0B0F17" />
+    <title>我的实际用量 · 深夜开发者</title>
+    <script src="theme.js"></script>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="usage.css" />
+    <script defer src="models.js"></script>
+    <script defer src="pricing.js"></script>
+    <script defer src="billing.js"></script>
+    <script defer src="usage-import.js"></script>
+    <script defer src="usage-card.js"></script>
+    <script src="usage.js" defer></script>
+  </head>
+  <body class="usage">
+    <header>
+      <div class="nav">
+        <div class="brand">
+          <span class="mark" aria-hidden="true"><i></i><i></i><i></i></span
+          >深夜开发者
+        </div>
+        <a href="index.html" class="back">费用计算器 ↗</a>
+        <button type="button" id="theme-toggle" aria-label="切换到浅色主题"><span class="mode-icon" aria-hidden="true">☀</span><span class="mode-label">浅色</span></button>
+      </div>
+    </header>
+    <main>
+      <div class="heading">
+        <h1>我的实际用量</h1>
+        <a class="guide-link" href="index.html#guide">重新导入用量 ↗</a>
+      </div>
+      <p id="sync" role="status"></p>
+      <section class="summary" aria-label="本月用量概览">
+        <div>
+          <small>所选月份总用量</small><strong id="grand">—</strong
+          ><span>Token · 含缓存</span>
+        </div>
+        <div><small>活跃天数</small><b id="active">—</b></div>
+        <div><small>使用模型</small><b id="modelCount">—</b></div>
+        <div><small>缓存读取占输入</small><b id="cacheRatio">—</b></div>
+      </section>
+      <div class="analysis-grid">
+        <section class="card chart-card">
+          <div class="chart-head">
+            <h2>用量轨迹</h2>
+            <div class="tabs">
+              <button id="calendarTab" aria-pressed="true">月历</button
+              ><button id="trendTab" aria-pressed="false">趋势</button>
+            </div>
+          </div>
+          <div class="filters">
+            <div class="months">
+              <button id="prev" aria-label="上一月">‹</button
+              ><label
+                ><span class="sr">选择月份</span
+                ><input type="month" id="month" /></label
+              ><button id="next" aria-label="下一月">›</button>
+            </div>
+            <label
+              ><span class="sr">按工具筛选</span
+              ><select id="tool">
+                <option value="">全部工具</option>
+              </select></label
+            >
+          </div>
+          <div id="calendar"></div>
+          <div id="trend" hidden></div>
+          <p id="chart-note"></p>
+        </section>
+        <section class="card details">
+          <div class="chart-head">
+            <h2>用量明细</h2>
+            <button id="whole">查看整月</button>
+          </div>
+          <p id="period"></p>
+          <div class="bill-summary" id="day-bill"></div>
+          <div id="breakdown"></div>
+          <p class="unit">按记录用量与模型单价折算。缓存写入按普通输入计，未含写入附加费、工具费及税费。</p>
+          <div class="usage-actions">
+          <button class="primary" id="share-usage-card" disabled>生成分享卡</button>
+          <button class="usage-secondary" id="use" disabled>
+            用这份用量对比费用 →
+          </button>
+          </div>
+        </section>
+      </div>
+      <details class="card source">
+        <summary>数据来源与统计口径</summary>
+        <p>
+          数据由用户导入并保存在当前浏览器标签页，按日志中记录的日期、模型与工具展示。
+        </p>
+        <div id="sources"></div>
+        <p>
+          总用量为输入加输出。输入包含普通输入、缓存读取与缓存写入。缓存折算按读取量除以输入量计算，转入计算器后的金额按其价格快照估算。
+        </p>
+      </details>
+    </main>
+  <dialog id="usage-card-preview" aria-labelledby="usage-card-title">
+  <div class="dialoghead">
+    <h2 id="usage-card-title">用量分享卡</h2>
+    <button type="button" id="close-usage-card" aria-label="关闭预览">×</button>
+  </div>
+  <img id="usage-card-image" alt="个人 AI 用量、估算费用、使用热力图与主力工具" />
+  <a class="primary" id="save-usage-card" download="深夜开发者-用量分享卡.png">下载图片</a>
+</dialog>
+
+  </body>
+</html>

@@ -398,5 +398,15 @@ if (keys.every((key) => actualUsage.has(key))) {
 }
 
 const publicSite = document.documentElement.dataset.public === "true";
-setMode(!publicSite && location.protocol !== "file:");
-if (!publicSite) syncBill();
+if (publicSite) {
+  const imported = UsageImport.load();
+  byId("billMode").hidden = !imported.length;
+  if (imported.length) {
+    actualRows = imported.filter(row =>
+      (row.date === period || row.date.startsWith(period + "-")) && (!toolFilter || row.tool === toolFilter));
+  }
+  setMode(Boolean(imported.length && requestedPeriod));
+} else {
+  setMode(location.protocol !== "file:");
+  syncBill();
+}

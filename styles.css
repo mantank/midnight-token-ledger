@@ -772,9 +772,15 @@ input[aria-invalid="true"] {
 .bill-editor input{width:100%;padding:7px;border-radius:6px;border:1px solid var(--line);color:var(--ink);background:var(--page)}
 .bill-editor button{margin:8px 8px 0 0}
 
-.install-panel {display:flex;justify-content:space-between;align-items:center;gap:20px;padding:20px 22px;margin-bottom:20px}
-.install-panel p {color:var(--muted);margin-top:8px;font-size:13px}
-.install-panel p a {color:var(--accent)}
-.install-actions {display:grid;gap:8px;flex:none;text-align:center}
-.install-actions a:not(.primary) {color:var(--accent);font-size:13px}
-@media(max-width:700px){.install-panel{display:grid;gap:12px}.install-actions{justify-items:start}}
+.guide-panel {padding:22px;margin-bottom:22px}
+.guide-head {display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.guide-panel p {color:var(--muted);margin-top:6px;font-size:13px}
+.guide-flow {display:grid;grid-template-columns:1fr 1fr;margin-top:18px;gap:16px}
+.guide-step {padding:16px;border:1px solid var(--line);border-radius:12px;min-width:0;background:var(--page)}
+.guide-step h3 {font-size:15px;margin:0}
+.guide-step .primary {margin-top:10px}
+.guide-step details {margin-top:10px;font-size:12px;color:var(--muted)}
+.guide-step textarea {display:block;width:100%;margin-top:10px;padding:8px;border:1px solid var(--line);border-radius:8px;color:var(--ink);background:var(--surface);font:13px/1.5 ui-monospace,monospace;resize:vertical}
+.guide-link {color:var(--accent);font-weight:650;font-size:13px}
+#guide-status:not(:empty) {margin-top:12px}
+@media(max-width:700px) {.guide-flow {grid-template-columns:1fr}.guide-panel{padding:16px}}
